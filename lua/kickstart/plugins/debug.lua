@@ -81,6 +81,21 @@ return {
     local dap = require 'dap'
     local dapui = require 'dapui'
 
+    dap.configurations.kotlin = dap.configurations.kotlin or {}
+    table.insert(dap.configurations.kotlin, {
+      type = 'kotlin',
+      name = 'Attach to Kotlin debug server',
+      request = 'attach',
+      hostName = function()
+        return vim.fn.input('Docker Host: ', '127.0.0.1')
+      end,
+      port = function()
+        return tonumber(vim.fn.input('Debug Port: ', '28100'))
+      end,
+      projectRoot = vim.fn.getcwd(),
+      timeout = 30000,
+    })
+
     require('mason-nvim-dap').setup {
       -- Makes a best effort to setup the various debuggers with
       -- reasonable debug configurations
@@ -95,6 +110,7 @@ return {
       ensure_installed = {
         -- Update this to ensure that you have the debuggers for the langs you want
         'delve',
+        'kotlin-language-server',
       },
     }
 
