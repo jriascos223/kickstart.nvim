@@ -203,6 +203,7 @@ require('lazy').setup({
       words = { enabled = true },
     },
     config = function(_, opts)
+      require('snacks').setup(opts)
       local picker = require 'snacks.picker'
       vim.keymap.set('n', '<leader>sf', picker.files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>sg', picker.grep, { desc = '[S]earch by [G]rep' })
@@ -420,7 +421,6 @@ require('lazy').setup({
           map('grd', snacks.lsp_definitions, '[G]oto [D]efinition')
           map('grt', snacks.lsp_type_definitions, '[G]oto [T]ype Definition')
 
-          map('gO', snacks.lsp_document_symbols, 'Open Document Symbols')
           map('gW', snacks.lsp_workspace_symbols, 'Open Workspace Symbols')
 
           -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
