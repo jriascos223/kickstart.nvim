@@ -8,10 +8,6 @@ end, {})
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
--- Disable netrw for snacks explorer
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
-
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = false
 
@@ -104,6 +100,10 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
+vim.keymap.set('n', '<leader>ds', function()
+  vim.diagnostic.open_float(nil, { focus = false })
+end, { desc = 'Show diagnostics in floating window' })
+
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
@@ -180,17 +180,18 @@ require('lazy').setup({
     'folke/snacks.nvim',
     priority = 1000,
     lazy = false,
-    ---@type snacks.Config
     opts = {
-      -- your configuration comes here
-      -- or leave it empty to use the default settings
-      -- refer to the configuration section below
       bigfile = { enabled = true },
       dashboard = { enabled = true },
       explorer = {
-
         enabled = true,
         replace_netrw = true,
+        show_hidden = true,
+        filters = {
+          hidden = true,
+          dotfiles = true,
+          gitignored = true,
+        },
       },
       indent = { enabled = true },
       input = { enabled = true },
@@ -202,17 +203,36 @@ require('lazy').setup({
       statuscolumn = { enabled = true },
       words = { enabled = true },
     },
+
     config = function(_, opts)
       require('snacks').setup(opts)
+
       local picker = require 'snacks.picker'
-      vim.keymap.set('n', '<leader>sf', picker.files, { desc = '[S]earch [F]iles' })
-      vim.keymap.set('n', '<leader>sg', picker.grep, { desc = '[S]earch by [G]rep' })
-      vim.keymap.set('n', '<leader>sw', picker.grep_word, { desc = '[S]earch [W]ord under cursor' })
-      vim.keymap.set('n', '<leader>sb', picker.lines, { desc = '[S]earch [B]uffer' })
-      vim.keymap.set('n', '<leader>sr', picker.recent, { desc = '[S]earch [R]ecent files' })
-      vim.keymap.set('n', '<leader>sh', picker.help, { desc = '[S]earch [H]elp' })
-      vim.keymap.set('n', '<leader>sk', picker.keymaps, { desc = '[S]earch [K]eymaps' })
-      -- custom Ex/Sex/Vex replacing netrw
+
+      -- IMPORTANT: wrap picker functions
+      vim.keymap.set('n', '<leader>sf', function()
+        picker.files()
+      end, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<leader>sg', function()
+        picker.grep()
+      end, { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('n', '<leader>sw', function()
+        picker.grep_word()
+      end, { desc = '[S]earch [W]ord under cursor' })
+      vim.keymap.set('n', '<leader>sb', function()
+        picker.lines()
+      end, { desc = '[S]earch [B]uffer' })
+      vim.keymap.set('n', '<leader>sr', function()
+        picker.recent()
+      end, { desc = '[S]earch [R]ecent files' })
+      vim.keymap.set('n', '<leader>sh', function()
+        picker.help()
+      end, { desc = '[S]earch [H]elp' })
+      vim.keymap.set('n', '<leader>sk', function()
+        picker.keymaps()
+      end, { desc = '[S]earch [K]eymaps' })
+
+      -- Explorer commands
       vim.api.nvim_create_user_command('Ex', function(args)
         require('snacks').explorer { path = args.args ~= '' and args.args or '.' }
       end, { nargs = '?' })
@@ -461,17 +481,6 @@ require('lazy').setup({
               callback = function(event2)
                 vim.lsp.buf.clear_references()
                 vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
-              end,
-            })
-
-            vim.api.nvim_create_autocmd('VimEnter', {
-              callback = function(data)
-                local directory = vim.fn.isdirectory(data.file) == 1
-                if not directory then
-                  return
-                end
-                vim.cmd.cd(data.file)
-                require('snacks').explorer()
               end,
             })
           end
