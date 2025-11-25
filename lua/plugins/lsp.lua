@@ -12,7 +12,17 @@ return {
       -- snacks.nvim must already be installed/loaded elsewhere in your setup
     },
     config = function()
-      -- Attach-time keymaps and UI using Snacks pickers
+      local servers = {
+        lua_ls = {
+          settings = {
+            Lua = {
+              completion = { callSnippet = 'Replace' },
+              -- diagnostics = { disable = { 'missing-fields' } },
+            },
+          },
+        },
+      }
+
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
         callback = function(event)
@@ -95,27 +105,14 @@ return {
       -- Capabilities (blink.cmp)
       local capabilities = require('blink.cmp').get_lsp_capabilities()
 
-      -- Servers
-      local servers = {
-        clangd = {},
-        lua_ls = {
-          settings = {
-            Lua = {
-              completion = { callSnippet = 'Replace' },
-              -- diagnostics = { disable = { 'missing-fields' } },
-            },
-          },
-        },
-        -- add more servers here as needed
-      }
-
       -- Mason tooling
       local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, { 'stylua', 'clangd' })
+      vim.list_extend(ensure_installed, { 'stylua', 'clangd', 'jdtls' })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       require('mason-lspconfig').setup {
         ensure_installed = {}, -- handled by mason-tool-installer
+        automatic_enable = false,
         automatic_installation = false,
         handlers = {
           function(server_name)
