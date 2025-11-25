@@ -21,6 +21,7 @@ return {
             },
           },
         },
+        kotlin_lsp = {},
       }
 
       vim.api.nvim_create_autocmd('LspAttach', {
@@ -112,7 +113,11 @@ return {
 
       require('mason-lspconfig').setup {
         ensure_installed = {}, -- handled by mason-tool-installer
-        automatic_enable = false,
+        automatic_enable = {
+          exclude = {
+            'jdtls',
+          },
+        },
         automatic_installation = false,
         handlers = {
           function(server_name)
