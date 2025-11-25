@@ -16,6 +16,7 @@ return {
       local servers = {
         clangd = {},
         lua_ls = { settings = { Lua = { completion = { callSnippet = 'Replace' } } } },
+        jdtls = {},
       }
 
       local ensure = vim.tbl_keys(servers)
