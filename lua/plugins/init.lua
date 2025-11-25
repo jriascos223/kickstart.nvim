@@ -12,6 +12,7 @@ require('lazy').setup({
   { import = 'plugins.cmp' },
   { import = 'plugins.lsp' },
   { import = 'plugins.formatting' },
+  { import = 'plugins.debug' },
   { import = 'plugins.java' },
 }, {
   ui = {
