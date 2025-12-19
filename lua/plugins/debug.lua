@@ -1,10 +1,4 @@
 -- debug.lua
---
--- Shows how to use the DAP plugin to debug your code.
---
--- Primarily focused on configuring the debugger for Go, but can
--- be extended to other languages as well. That's why it's called
--- kickstart.nvim and not kitchen-sink.nvim ;)
 
 return {
   -- NOTE: Yes, you can install new plugins here!
@@ -81,6 +75,29 @@ return {
     local dap = require 'dap'
     local dapui = require 'dapui'
 
+    require('mason-nvim-dap').setup {
+      -- Makes a best effort to setup the various debuggers with
+      -- reasonable debug configurations
+      automatic_installation = true,
+
+      -- You can provide additional configuration to the handlers,
+      -- see mason-nvim-dap README for more information
+      handlers = {},
+
+      -- You'll need to check that you have the required things installed
+      -- online, please don't ask me how to install them :)
+      ensure_installed = {},
+    }
+
+    -- -- Define the Kotlin ADAPTER (this is what was missing!)
+    -- dap.adapters.kotlin = {
+    --   type = 'executable',
+    --   command = vim.fn.stdpath 'data' .. '/mason/bin/kotlin-debug-adapter',
+    --   options = {
+    --     auto_continue_if_many_stopped = false,
+    --   },
+    -- }
+
     dap.configurations.kotlin = dap.configurations.kotlin or {}
     table.insert(dap.configurations.kotlin, {
       type = 'kotlin',
@@ -95,22 +112,6 @@ return {
       projectRoot = vim.fn.getcwd(),
       timeout = 30000,
     })
-
-    require('mason-nvim-dap').setup {
-      -- Makes a best effort to setup the various debuggers with
-      -- reasonable debug configurations
-      automatic_installation = true,
-
-      -- You can provide additional configuration to the handlers,
-      -- see mason-nvim-dap README for more information
-      handlers = {},
-
-      -- You'll need to check that you have the required things installed
-      -- online, please don't ask me how to install them :)
-      ensure_installed = {
-        -- Update this to ensure that you have the debuggers for the langs you want
-      },
-    }
 
     -- Dap UI setup
     -- For more information, see |:help nvim-dap-ui|
