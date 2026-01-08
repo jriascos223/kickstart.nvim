@@ -89,7 +89,44 @@ return {
       ensure_installed = {},
     }
 
-    -- -- Define the Kotlin ADAPTER (this is what was missing!)
+    -- Python adapter
+    dap.adapters.python = function(cb, config)
+      if config.request == 'attach' then
+        local port = (config.connect or config).port
+        local host = (config.connect or config).host or '127.0.0.1'
+        cb {
+          type = 'server',
+          port = assert(port, '`connect.port` is required for a python `attach` configuration'),
+          host = host,
+          options = {
+            source_filetype = 'python',
+          },
+        }
+      else
+        cb {
+          type = 'executable',
+          command = vim.fn.stdpath 'data' .. '/mason/packages/debugpy/venv/bin/python',
+          args = { '-m', 'debugpy.adapter' },
+          options = {
+            source_filetype = 'python',
+          },
+        }
+      end
+    end
+
+    -- Python configurations
+    dap.configurations.python = {
+      {
+        type = 'python',
+        request = 'launch',
+        name = 'Launch file',
+        program = '${file}',
+        pythonPath = function()
+          return '/usr/bin/python3'
+        end,
+      },
+    }
+
     -- dap.adapters.kotlin = {
     --   type = 'executable',
     --   command = vim.fn.stdpath 'data' .. '/mason/bin/kotlin-debug-adapter',
@@ -98,7 +135,6 @@ return {
     --   },
     -- }
 
-    dap.configurations.kotlin = dap.configurations.kotlin or {}
     table.insert(dap.configurations.kotlin, {
       type = 'kotlin',
       name = 'Attach to Kotlin debug server',
@@ -112,6 +148,7 @@ return {
       projectRoot = vim.fn.getcwd(),
       timeout = 30000,
     })
+    dap.configurations.kotlin = dap.configurations.kotlin or {}
 
     -- Dap UI setup
     -- For more information, see |:help nvim-dap-ui|

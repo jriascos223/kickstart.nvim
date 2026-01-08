@@ -108,7 +108,7 @@ return {
 
       -- Mason tooling
       local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, { 'stylua', 'clangd', 'jdtls' })
+      vim.list_extend(ensure_installed, { 'stylua', 'clangd', 'jdtls', 'debugpy' })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       require('mason-lspconfig').setup {
@@ -126,6 +126,11 @@ return {
             require('lspconfig')[server_name].setup(server)
           end,
         },
+      }
+
+      -- Setup sourcekit manually (comes with Xcode, not Mason)
+      require('lspconfig').sourcekit.setup {
+        capabilities = capabilities,
       }
     end,
   },
