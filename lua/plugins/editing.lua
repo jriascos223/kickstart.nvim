@@ -1,6 +1,25 @@
 return {
   'NMAC427/guess-indent.nvim',
   {
+    'kylechui/nvim-surround',
+    event = 'VeryLazy',
+    opts = {},
+  },
+  {
+    'windwp/nvim-autopairs',
+    event = 'InsertEnter',
+    opts = {},
+  },
+  {
+    'nvim-pack/nvim-spectre',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    keys = {
+      { '<leader>S', '<cmd>lua require("spectre").toggle()<cr>', desc = 'Toggle Spectre' },
+      { '<leader>sw', '<cmd>lua require("spectre").open_visual({select_word=true})<cr>', desc = 'Search current word' },
+      { '<leader>sp', '<cmd>lua require("spectre").open_file_search({select_word=true})<cr>', desc = 'Search in current file' },
+    },
+  },
+  {
     'lewis6991/gitsigns.nvim',
     opts = {
       signs = { add = { text = '+' }, change = { text = '~' }, delete = { text = '_' }, topdelete = { text = '‾' }, changedelete = { text = '~' } },

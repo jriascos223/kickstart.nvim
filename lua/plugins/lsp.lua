@@ -9,6 +9,7 @@ return {
       'WhoIsSethDaniel/mason-tool-installer.nvim',
       { 'j-hui/fidget.nvim', opts = {} },
       'saghen/blink.cmp',
+      'b0o/schemastore.nvim',
       -- snacks.nvim must already be installed/loaded elsewhere in your setup
     },
     config = function()
@@ -22,6 +23,24 @@ return {
           },
         },
         kotlin_lsp = {},
+        yamlls = {
+          settings = {
+            yaml = {
+              schemaStore = {
+                enable = true,
+                url = 'https://www.schemastore.org/api/json/catalog.json',
+              },
+            },
+          },
+        },
+        jsonls = {
+          settings = {
+            json = {
+              schemas = require('schemastore').json.schemas(),
+              validate = { enable = true },
+            },
+          },
+        },
       }
 
       vim.api.nvim_create_autocmd('LspAttach', {

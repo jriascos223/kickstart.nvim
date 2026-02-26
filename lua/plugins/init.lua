@@ -15,6 +15,12 @@ require('lazy').setup({
   { import = 'plugins.debug' },
   { import = 'plugins.java' },
   { import = 'plugins.agent' },
+  { import = 'plugins.database' },
+  { import = 'plugins.rest' },
+  { import = 'plugins.navigation' },
+  { import = 'plugins.git' },
+  { import = 'plugins.testing' },
+  { import = 'plugins.notes' },
 }, {
   ui = {
     icons = vim.g.have_nerd_font and {} or {

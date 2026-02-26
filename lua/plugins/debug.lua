@@ -127,28 +127,45 @@ return {
       },
     }
 
-    -- dap.adapters.kotlin = {
-    --   type = 'executable',
-    --   command = vim.fn.stdpath 'data' .. '/mason/bin/kotlin-debug-adapter',
-    --   options = {
-    --     auto_continue_if_many_stopped = false,
-    --   },
-    -- }
+    -- Java/Kotlin remote debug adapter (for JVM JDWP)
+    -- Uses a function adapter to allow dynamic port selection
+    dap.adapters.java = function(callback, config)
+      callback({
+        type = 'server',
+        host = config.hostName or '127.0.0.1',
+        port = config.port,
+      })
+    end
 
-    table.insert(dap.configurations.kotlin, {
-      type = 'kotlin',
-      name = 'Attach to Kotlin debug server',
-      request = 'attach',
-      hostName = function()
-        return vim.fn.input('Docker Host: ', '127.0.0.1')
-      end,
-      port = function()
-        return tonumber(vim.fn.input('Debug Port: ', '28100'))
-      end,
-      projectRoot = vim.fn.getcwd(),
-      timeout = 30000,
-    })
-    dap.configurations.kotlin = dap.configurations.kotlin or {}
+    -- Kotlin configurations
+    dap.configurations.kotlin = {
+      {
+        type = 'java',
+        name = 'Attach to external-measurements-events',
+        request = 'attach',
+        hostName = '127.0.0.1',
+        port = 33715,
+      },
+      {
+        type = 'java',
+        name = 'Attach to external-measurements-app',
+        request = 'attach',
+        hostName = '127.0.0.1',
+        port = 17908,
+      },
+      {
+        type = 'java',
+        name = 'Attach to JVM (prompt for port)',
+        request = 'attach',
+        hostName = '127.0.0.1',
+        port = function()
+          return tonumber(vim.fn.input('Debug Port: ', '33715'))
+        end,
+      },
+    }
+
+    -- Reuse kotlin configs for java files
+    dap.configurations.java = dap.configurations.kotlin
 
     -- Dap UI setup
     -- For more information, see |:help nvim-dap-ui|
