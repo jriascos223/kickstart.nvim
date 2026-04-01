@@ -127,45 +127,61 @@ return {
       },
     }
 
-    -- Java/Kotlin remote debug adapter (for JVM JDWP)
-    -- Uses a function adapter to allow dynamic port selection
-    dap.adapters.java = function(callback, config)
-      callback({
-        type = 'server',
-        host = config.hostName or '127.0.0.1',
-        port = config.port,
-      })
-    end
+    dap.adapters.kotlin = {
+      type = 'executable',
+      command = vim.fn.stdpath 'data' .. '/mason/packages/kotlin-debug-adapter/adapter/bin/kotlin-debug-adapter',
+    }
 
     -- Kotlin configurations
     dap.configurations.kotlin = {
       {
-        type = 'java',
+        type = 'kotlin',
+        name = 'Attach to healthcare-dev',
+        request = 'attach',
+        hostName = '127.0.0.1',
+        port = 51532,
+        projectRoot = '${workspaceFolder}',
+        timeout = 30000,
+      },
+      {
+        type = 'kotlin',
+        name = 'Attach to healthcare-events',
+        request = 'attach',
+        hostName = '127.0.0.1',
+        port = 28100,
+        projectRoot = '${workspaceFolder}',
+        timeout = 30000,
+      },
+      {
+        type = 'kotlin',
         name = 'Attach to external-measurements-events',
         request = 'attach',
         hostName = '127.0.0.1',
         port = 33715,
+        projectRoot = '${workspaceFolder}',
+        timeout = 30000,
       },
       {
-        type = 'java',
+        type = 'kotlin',
         name = 'Attach to external-measurements-app',
         request = 'attach',
         hostName = '127.0.0.1',
         port = 17908,
+        projectRoot = '${workspaceFolder}',
+        timeout = 30000,
       },
       {
-        type = 'java',
+        type = 'kotlin',
         name = 'Attach to JVM (prompt for port)',
         request = 'attach',
         hostName = '127.0.0.1',
         port = function()
-          return tonumber(vim.fn.input('Debug Port: ', '33715'))
+          return tonumber(vim.fn.input('Debug Port: ', '51532'))
         end,
+        projectRoot = '${workspaceFolder}',
+        timeout = 30000,
       },
     }
-
-    -- Reuse kotlin configs for java files
-    dap.configurations.java = dap.configurations.kotlin
 
     -- Dap UI setup
     -- For more information, see |:help nvim-dap-ui|

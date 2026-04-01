@@ -23,6 +23,7 @@ return {
           },
         },
         kotlin_lsp = {},
+        ts_ls = {},
         yamlls = {
           settings = {
             yaml = {

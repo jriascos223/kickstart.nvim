@@ -16,7 +16,7 @@ return {
     opts = {
       notify_on_error = false,
       format_on_save = function(bufnr)
-        local disable = { kotlin = true, c = true, cpp = true, swift = true, json = true, yaml = true }
+        local disable = { kotlin = true, c = true, cpp = true, swift = true, json = true, yaml = true, typescriptreact = true, typescript = true }
         if disable[vim.bo[bufnr].filetype] then
           return nil
         end
