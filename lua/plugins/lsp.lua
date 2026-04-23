@@ -126,6 +126,11 @@ return {
       -- Capabilities (blink.cmp)
       local capabilities = require('blink.cmp').get_lsp_capabilities()
 
+      for server_name, server in pairs(servers) do
+        server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+        vim.lsp.config(server_name, server)
+      end
+
       -- Mason tooling
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, { 'stylua', 'clangd', 'jdtls', 'debugpy' })
@@ -139,19 +144,15 @@ return {
           },
         },
         automatic_installation = false,
-        handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
-          end,
-        },
       }
 
-      -- Setup sourcekit manually (comes with Xcode, not Mason)
-      require('lspconfig').sourcekit.setup {
-        capabilities = capabilities,
-      }
+      -- Setup sourcekit manually when Xcode's language server is available.
+      if vim.fn.executable 'sourcekit-lsp' == 1 then
+        vim.lsp.config('sourcekit', {
+          capabilities = capabilities,
+        })
+        vim.lsp.enable 'sourcekit'
+      end
     end,
   },
 }
