@@ -1,10 +1,4 @@
 -- debug.lua
---
--- Shows how to use the DAP plugin to debug your code.
---
--- Primarily focused on configuring the debugger for Go, but can
--- be extended to other languages as well. That's why it's called
--- kickstart.nvim and not kitchen-sink.nvim ;)
 
 return {
   -- NOTE: Yes, you can install new plugins here!
@@ -81,21 +75,6 @@ return {
     local dap = require 'dap'
     local dapui = require 'dapui'
 
-    dap.configurations.kotlin = dap.configurations.kotlin or {}
-    table.insert(dap.configurations.kotlin, {
-      type = 'kotlin',
-      name = 'Attach to Kotlin debug server',
-      request = 'attach',
-      hostName = function()
-        return vim.fn.input('Docker Host: ', '127.0.0.1')
-      end,
-      port = function()
-        return tonumber(vim.fn.input('Debug Port: ', '28100'))
-      end,
-      projectRoot = vim.fn.getcwd(),
-      timeout = 30000,
-    })
-
     require('mason-nvim-dap').setup {
       -- Makes a best effort to setup the various debuggers with
       -- reasonable debug configurations
@@ -107,10 +86,100 @@ return {
 
       -- You'll need to check that you have the required things installed
       -- online, please don't ask me how to install them :)
-      ensure_installed = {
-        -- Update this to ensure that you have the debuggers for the langs you want
-        'delve',
-        'kotlin-language-server',
+      ensure_installed = {},
+    }
+
+    -- Python adapter
+    dap.adapters.python = function(cb, config)
+      if config.request == 'attach' then
+        local port = (config.connect or config).port
+        local host = (config.connect or config).host or '127.0.0.1'
+        cb {
+          type = 'server',
+          port = assert(port, '`connect.port` is required for a python `attach` configuration'),
+          host = host,
+          options = {
+            source_filetype = 'python',
+          },
+        }
+      else
+        cb {
+          type = 'executable',
+          command = vim.fn.stdpath 'data' .. '/mason/packages/debugpy/venv/bin/python',
+          args = { '-m', 'debugpy.adapter' },
+          options = {
+            source_filetype = 'python',
+          },
+        }
+      end
+    end
+
+    -- Python configurations
+    dap.configurations.python = {
+      {
+        type = 'python',
+        request = 'launch',
+        name = 'Launch file',
+        program = '${file}',
+        pythonPath = function()
+          return '/usr/bin/python3'
+        end,
+      },
+    }
+
+    dap.adapters.kotlin = {
+      type = 'executable',
+      command = vim.fn.stdpath 'data' .. '/mason/packages/kotlin-debug-adapter/adapter/bin/kotlin-debug-adapter',
+    }
+
+    -- Kotlin configurations
+    dap.configurations.kotlin = {
+      {
+        type = 'kotlin',
+        name = 'Attach to healthcare-dev',
+        request = 'attach',
+        hostName = '127.0.0.1',
+        port = 51532,
+        projectRoot = '${workspaceFolder}',
+        timeout = 30000,
+      },
+      {
+        type = 'kotlin',
+        name = 'Attach to healthcare-events',
+        request = 'attach',
+        hostName = '127.0.0.1',
+        port = 28100,
+        projectRoot = '${workspaceFolder}',
+        timeout = 30000,
+      },
+      {
+        type = 'kotlin',
+        name = 'Attach to external-measurements-events',
+        request = 'attach',
+        hostName = '127.0.0.1',
+        port = 33715,
+        projectRoot = '${workspaceFolder}',
+        timeout = 30000,
+      },
+      {
+        type = 'kotlin',
+        name = 'Attach to external-measurements-app',
+        request = 'attach',
+        hostName = '127.0.0.1',
+        port = 17908,
+        projectRoot = '${workspaceFolder}',
+        timeout = 30000,
+      },
+      {
+        type = 'kotlin',
+        name = 'Attach to JVM (prompt for port)',
+        request = 'attach',
+        hostName = '127.0.0.1',
+        port = function()
+          return tonumber(vim.fn.input('Debug Port: ', '51532'))
+        end,
+        projectRoot = '${workspaceFolder}',
+        timeout = 30000,
       },
     }
 
