@@ -22,7 +22,6 @@ return {
             },
           },
         },
-        kotlin_lsp = {},
         ts_ls = {},
         yamlls = {
           settings = {
@@ -133,7 +132,7 @@ return {
 
       -- Mason tooling
       local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, { 'stylua', 'clangd', 'jdtls', 'debugpy' })
+      vim.list_extend(ensure_installed, { 'kotlin-lsp' })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       require('mason-lspconfig').setup {

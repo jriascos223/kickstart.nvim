@@ -1,0 +1,6 @@
+WRN 2026-04-23T14:01:55.874 ?.29555    server_start:197: Failed to start server: operation not permitted: /var/folders/gg/7xyj4tdn2558vw0r_z9jtsl00000gp/T/nvim.joseph.riascos/k89UM5/nvim.29555.0
+WRN 2026-04-23T14:02:01.705 ?.29585    server_start:197: Failed to start server: operation not permitted: /var/folders/gg/7xyj4tdn2558vw0r_z9jtsl00000gp/T/nvim.joseph.riascos/PBNdcA/nvim.29585.0
+WRN 2026-04-23T14:02:43.911 ?.30295    server_start:197: Failed to start server: operation not permitted: /var/folders/gg/7xyj4tdn2558vw0r_z9jtsl00000gp/T/nvim.joseph.riascos/P5Ljt5/nvim.30295.0
+WRN 2026-04-23T14:02:49.284 ?.30321    server_start:197: Failed to start server: operation not permitted: /var/folders/gg/7xyj4tdn2558vw0r_z9jtsl00000gp/T/nvim.joseph.riascos/3Hlzfe/nvim.30321.0
+WRN 2026-04-23T14:08:14.592 ?.39036    server_start:197: Failed to start server: operation not permitted: /var/folders/gg/7xyj4tdn2558vw0r_z9jtsl00000gp/T/nvim.joseph.riascos/yaRg7e/nvim.39036.0
+WRN 2026-05-12T13:55:46.244 ?.5285     server_start:197: Failed to start server: operation not permitted: /var/folders/gg/7xyj4tdn2558vw0r_z9jtsl00000gp/T/nvim.joseph.riascos/Bs7Ho7/nvim.5285.0
