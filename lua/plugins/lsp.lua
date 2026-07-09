@@ -140,6 +140,11 @@ return {
         automatic_enable = {
           exclude = {
             'jdtls',
+            -- kotlin_lsp is owned entirely by kotlin.nvim (it assigns
+            -- vim.lsp.config.kotlin_lsp and calls vim.lsp.enable itself).
+            -- Excluding it here prevents mason-lspconfig from starting a
+            -- second, misconfigured client from nvim-lspconfig defaults.
+            'kotlin_lsp',
           },
         },
         automatic_installation = false,
@@ -152,6 +157,67 @@ return {
         })
         vim.lsp.enable 'sourcekit'
       end
+    end,
+  },
+  {
+    'AlexandrosAlexiou/kotlin.nvim',
+    ft = { 'kotlin' },
+    dependencies = {
+      'mason.nvim',
+      'mason-lspconfig.nvim',
+      -- NOTE: oil.nvim is intentionally omitted. kotlin.nvim's oil integration
+      -- is optional (guarded by pcall) and this config doesn't use oil.nvim, so
+      -- listing it as a dependency only causes lazy.nvim to fail resolving it.
+      {
+        'folke/trouble.nvim',
+        cmd = 'Trouble',
+        opts = {},
+      },
+    },
+    config = function()
+      require('kotlin').setup {
+        root_markers = {
+          'gradlew',
+          '.git',
+          'mvnw',
+          'settings.gradle',
+        },
+
+        jdk_for_symbol_resolution = nil, -- Auto-detect from project
+
+        -- Uses bundled JRE from Mason (zero-dependency)
+        jre_path = nil,
+
+        jvm_args = {
+          '-Xmx4g',
+        },
+
+        -- All inlay hints enabled by default
+        inlay_hints = {
+          enabled = true,
+          parameters = true,
+          parameters_compiled = true,
+          parameters_excluded = false,
+          types_property = true,
+          types_variable = true,
+          function_return = true,
+          function_parameter = true,
+          lambda_return = true,
+          lambda_receivers_parameters = true,
+          value_ranges = true,
+          kotlin_time = true,
+        },
+      }
+
+      -- Kotlin-only keymaps. References/rename/code-actions/symbols are intentionally
+      -- NOT bound here: those go through the generic LspAttach maps (grr, grn, gra, gO,
+      -- gW, grd, gri, grt) which give the Snacks picker + preview for kotlin_lsp too,
+      -- since :KotlinReferences etc. are just wrappers around the standard vim.lsp.buf.*.
+      vim.keymap.set('n', '<leader>lkq', ':KotlinQuickFix<CR>', { desc = 'Kotlin quick fix' })
+      vim.keymap.set('n', '<leader>lko', ':KotlinOrganizeImports<CR>', { desc = 'Organize Kotlin imports' })
+      vim.keymap.set('n', '<leader>lkf', ':KotlinFormat<CR>', { desc = 'Format Kotlin buffer (LSP)' })
+      vim.keymap.set('n', '<leader>lkh', ':KotlinInlayHintsToggle<CR>', { desc = 'Toggle Kotlin inlay hints' })
+      vim.keymap.set('n', '<leader>lkc', ':KotlinCleanWorkspace<CR>', { desc = 'Clean Kotlin workspace' })
     end,
   },
 }
