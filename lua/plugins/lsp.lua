@@ -76,6 +76,33 @@ return {
             end),
             '[G]oto [R]eferences'
           )
+          -- Like grr, but hides any reference whose file NAME contains "Test".
+          map('grR', function()
+            local ok, picker = pcall(require, 'snacks.picker')
+            if ok and picker and type(picker.lsp_references) == 'function' then
+              return picker.lsp_references {
+                -- transform runs once per result item; return false to drop it.
+                transform = function(item)
+                  local name = item.file and vim.fn.fnamemodify(item.file, ':t') or ''
+                  if name:find('Test', 1, true) then
+                    return false
+                  end
+                  return item
+                end,
+              }
+            end
+            -- Fallback when Snacks isn't available: filter into the quickfix list.
+            vim.lsp.buf.references({ includeDeclaration = true }, {
+              on_list = function(res)
+                local items = vim.tbl_filter(function(it)
+                  local name = vim.fn.fnamemodify(it.filename or '', ':t')
+                  return not name:find('Test', 1, true)
+                end, res.items)
+                vim.fn.setqflist({}, ' ', { title = res.title, items = items, context = res.context })
+                vim.cmd 'botright copen'
+              end,
+            })
+          end, '[G]oto [R]eferences (no Test files)')
           map('gri', chooser('lsp_implementations', vim.lsp.buf.implementation), '[G]oto [I]mplementation')
           map('grt', chooser('lsp_type_definitions', vim.lsp.buf.type_definition), '[G]oto [T]ype Definition')
           map('gO', chooser('lsp_document_symbols', vim.lsp.buf.document_symbol), 'Open Document Symbols')
