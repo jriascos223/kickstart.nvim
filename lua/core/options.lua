@@ -44,3 +44,4 @@ vim.api.nvim_create_user_command('CopyPath', function(opts)
   vim.fn.setreg('+', path)
   vim.notify('Copied: ' .. path)
 end, { bang = true })
+vim.opt.jumpoptions:append 'view'

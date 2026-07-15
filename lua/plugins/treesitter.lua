@@ -1,11 +1,12 @@
 return {
   {
     'nvim-treesitter/nvim-treesitter',
-    branch = 'master',
+    lazy = false,
     build = ':TSUpdate',
-    main = 'nvim-treesitter.configs',
-    opts = {
-      ensure_installed = {
+    config = function()
+      require('nvim-treesitter').setup()
+
+      require('nvim-treesitter').install {
         'bash',
         'c',
         'diff',
@@ -29,11 +30,14 @@ return {
         'yaml',
         'json',
         'dockerfile',
-      },
-      auto_install = true,
-      ignore_install = { 'swift' }, -- Swift parser has compatibility issues with newer tree-sitter CLI
-      highlight = { enable = true, additional_vim_regex_highlighting = { 'ruby' } },
-      indent = { enable = true, disable = { 'ruby' } },
-    },
+      }
+
+      vim.api.nvim_create_autocmd('FileType', {
+        group = vim.api.nvim_create_augroup('nvim-treesitter-highlight', { clear = true }),
+        callback = function()
+          pcall(vim.treesitter.start)
+        end,
+      })
+    end,
   },
 }

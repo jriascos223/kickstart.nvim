@@ -172,6 +172,15 @@ return {
       },
       {
         type = 'kotlin',
+        name = 'Attach to backend app',
+        request = 'attach',
+        hostName = '127.0.0.1',
+        port = 5007,
+        projectRoot = '${workspaceFolder}',
+        timeout = 30000,
+      },
+      {
+        type = 'kotlin',
         name = 'Attach to JVM (prompt for port)',
         request = 'attach',
         hostName = '127.0.0.1',

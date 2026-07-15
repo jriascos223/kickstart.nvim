@@ -23,6 +23,7 @@ return {
           },
         },
         ts_ls = {},
+        bashls = {},
         yamlls = {
           settings = {
             yaml = {
@@ -159,7 +160,7 @@ return {
 
       -- Mason tooling
       local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, { 'kotlin-lsp' })
+      vim.list_extend(ensure_installed, { 'kotlin-lsp', 'shellcheck' })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       require('mason-lspconfig').setup {
@@ -167,23 +168,13 @@ return {
         automatic_enable = {
           exclude = {
             'jdtls',
-            -- kotlin_lsp is owned entirely by kotlin.nvim (it assigns
-            -- vim.lsp.config.kotlin_lsp and calls vim.lsp.enable itself).
-            -- Excluding it here prevents mason-lspconfig from starting a
-            -- second, misconfigured client from nvim-lspconfig defaults.
+            -- handled by kotlin lsp below
             'kotlin_lsp',
           },
         },
         automatic_installation = false,
       }
 
-      -- Setup sourcekit manually when Xcode's language server is available.
-      if vim.fn.executable 'sourcekit-lsp' == 1 then
-        vim.lsp.config('sourcekit', {
-          capabilities = capabilities,
-        })
-        vim.lsp.enable 'sourcekit'
-      end
     end,
   },
   {
@@ -192,9 +183,6 @@ return {
     dependencies = {
       'mason.nvim',
       'mason-lspconfig.nvim',
-      -- NOTE: oil.nvim is intentionally omitted. kotlin.nvim's oil integration
-      -- is optional (guarded by pcall) and this config doesn't use oil.nvim, so
-      -- listing it as a dependency only causes lazy.nvim to fail resolving it.
       {
         'folke/trouble.nvim',
         cmd = 'Trouble',
@@ -246,5 +234,34 @@ return {
       vim.keymap.set('n', '<leader>lkh', ':KotlinInlayHintsToggle<CR>', { desc = 'Toggle Kotlin inlay hints' })
       vim.keymap.set('n', '<leader>lkc', ':KotlinCleanWorkspace<CR>', { desc = 'Clean Kotlin workspace' })
     end,
+  },
+  {
+    cmd = { 'sourcekit-lsp' },
+    filetypes = { 'swift' },
+    root_markers = {
+      '.git',
+      'compile_commands.json',
+      '.sourcekit-lsp',
+      'Package.swift',
+    },
+    get_language_id = function(_, ftype)
+      return ftype
+    end,
+    capabilities = {
+      workspace = {
+        didChangeWatchedFiles = {
+          dynamicRegistration = true,
+        },
+      },
+      textDocument = {
+        diagnostic = {
+          dynamicRegistration = true,
+          relatedDocumentSupport = true,
+        },
+      },
+    },
+    config = function()
+        vim.lsp.enable("sourcekit")
+    end
   },
 }
