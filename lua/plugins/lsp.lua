@@ -175,6 +175,9 @@ return {
         automatic_installation = false,
       }
 
+      -- SourceKit-LSP (Swift) is not a Mason server -- it ships with the Swift
+      -- toolchain. Its config lives in lsp/sourcekit.lua; just enable it here.
+      vim.lsp.enable 'sourcekit'
     end,
   },
   {
@@ -234,34 +237,5 @@ return {
       vim.keymap.set('n', '<leader>lkh', ':KotlinInlayHintsToggle<CR>', { desc = 'Toggle Kotlin inlay hints' })
       vim.keymap.set('n', '<leader>lkc', ':KotlinCleanWorkspace<CR>', { desc = 'Clean Kotlin workspace' })
     end,
-  },
-  {
-    cmd = { 'sourcekit-lsp' },
-    filetypes = { 'swift' },
-    root_markers = {
-      '.git',
-      'compile_commands.json',
-      '.sourcekit-lsp',
-      'Package.swift',
-    },
-    get_language_id = function(_, ftype)
-      return ftype
-    end,
-    capabilities = {
-      workspace = {
-        didChangeWatchedFiles = {
-          dynamicRegistration = true,
-        },
-      },
-      textDocument = {
-        diagnostic = {
-          dynamicRegistration = true,
-          relatedDocumentSupport = true,
-        },
-      },
-    },
-    config = function()
-        vim.lsp.enable("sourcekit")
-    end
   },
 }
