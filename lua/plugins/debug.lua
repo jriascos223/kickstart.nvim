@@ -139,6 +139,17 @@ return {
       command = kotlin_debug_adapter,
     }
 
+    -- kotlin-debug-adapter emits the `initialized` event *before* it responds to
+    -- `initialize`, so nvim-dap drops it and never sends `configurationDone`.
+    -- The adapter then blocks waiting for that message and exits 1 after ~30s
+    -- ("Debug adapter didn't respond"). Send it ourselves once per session.
+    dap.listeners.after.initialize['kotlin_configuration_done'] = function(session)
+      if session.config and session.config.type == 'kotlin' and not session._kotlin_cfg_done then
+        session._kotlin_cfg_done = true
+        session:request('configurationDone', nil, function() end)
+      end
+    end
+
     -- Kotlin configurations
     dap.configurations.kotlin = {
       {
