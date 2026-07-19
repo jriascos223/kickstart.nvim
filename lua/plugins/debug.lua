@@ -127,55 +127,26 @@ return {
       },
     }
 
+    -- Mason ships the adapter as a .bat wrapper on Windows; the extensionless
+    -- path only resolves on unix.
+    local kotlin_debug_adapter = vim.fn.stdpath 'data' .. '/mason/packages/kotlin-debug-adapter/adapter/bin/kotlin-debug-adapter'
+    if vim.fn.has 'win32' == 1 then
+      kotlin_debug_adapter = kotlin_debug_adapter .. '.bat'
+    end
+
     dap.adapters.kotlin = {
       type = 'executable',
-      command = vim.fn.stdpath 'data' .. '/mason/packages/kotlin-debug-adapter/adapter/bin/kotlin-debug-adapter',
+      command = kotlin_debug_adapter,
     }
 
     -- Kotlin configurations
     dap.configurations.kotlin = {
       {
         type = 'kotlin',
-        name = 'Attach to healthcare-dev',
+        name = 'Attach to Gradle run (:5005)',
         request = 'attach',
         hostName = '127.0.0.1',
-        port = 51532,
-        projectRoot = '${workspaceFolder}',
-        timeout = 30000,
-      },
-      {
-        type = 'kotlin',
-        name = 'Attach to healthcare-events',
-        request = 'attach',
-        hostName = '127.0.0.1',
-        port = 28100,
-        projectRoot = '${workspaceFolder}',
-        timeout = 30000,
-      },
-      {
-        type = 'kotlin',
-        name = 'Attach to external-measurements-events',
-        request = 'attach',
-        hostName = '127.0.0.1',
-        port = 33715,
-        projectRoot = '${workspaceFolder}',
-        timeout = 30000,
-      },
-      {
-        type = 'kotlin',
-        name = 'Attach to external-measurements-app',
-        request = 'attach',
-        hostName = '127.0.0.1',
-        port = 17908,
-        projectRoot = '${workspaceFolder}',
-        timeout = 30000,
-      },
-      {
-        type = 'kotlin',
-        name = 'Attach to backend app',
-        request = 'attach',
-        hostName = '127.0.0.1',
-        port = 5007,
+        port = 5005,
         projectRoot = '${workspaceFolder}',
         timeout = 30000,
       },
@@ -185,7 +156,7 @@ return {
         request = 'attach',
         hostName = '127.0.0.1',
         port = function()
-          return tonumber(vim.fn.input('Debug Port: ', '51532'))
+          return tonumber(vim.fn.input('Debug Port: ', '5005'))
         end,
         projectRoot = '${workspaceFolder}',
         timeout = 30000,
