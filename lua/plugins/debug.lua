@@ -127,16 +127,24 @@ return {
       },
     }
 
-    -- Mason ships the adapter as a .bat wrapper on Windows; the extensionless
-    -- path only resolves on unix.
-    local kotlin_debug_adapter = vim.fn.stdpath 'data' .. '/mason/packages/kotlin-debug-adapter/adapter/bin/kotlin-debug-adapter'
+    -- Invoke the adapter's JVM directly rather than through Mason's launcher
+    -- script. On Windows the .bat wrapper runs under cmd.exe, which gets its own
+    -- console: the adapter's stdio binds to that console instead of the pipes
+    -- nvim-dap opened, so replies never reach nvim and the session hangs with
+    -- the adapter visibly running in a stray terminal window.
+    local kda_home = vim.fn.stdpath 'data' .. '/mason/packages/kotlin-debug-adapter/adapter'
+    local java_exe = 'java'
+    if vim.env.JAVA_HOME and vim.env.JAVA_HOME ~= '' then
+      java_exe = vim.env.JAVA_HOME .. '/bin/java'
+    end
     if vim.fn.has 'win32' == 1 then
-      kotlin_debug_adapter = kotlin_debug_adapter .. '.bat'
+      java_exe = java_exe .. '.exe'
     end
 
     dap.adapters.kotlin = {
       type = 'executable',
-      command = kotlin_debug_adapter,
+      command = java_exe,
+      args = { '-cp', kda_home .. '/lib/*', 'org.javacs.ktda.KDAMainKt' },
     }
 
     -- kotlin-debug-adapter emits the `initialized` event *before* it responds to
