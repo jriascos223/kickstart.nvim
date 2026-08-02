@@ -29,6 +29,25 @@ vim.opt.colorcolumn = '120'
 
 -- Final newline (ktlint: insert_final_newline = true)
 vim.opt.fixendofline = true
+-- Neovim seeds 'shell' from $SHELL but leaves 'shellcmdflag' at the cmd.exe
+-- default, so launching from a POSIX prompt on Windows (devkitPro's
+-- msys2_shell.bat, Git Bash) produces `bash /s /c ...` -- bash reads /s as a
+-- path and every plugin that shells out breaks, e.g. :TSInstall dies with
+-- "/s: Is a directory". Pin the native defaults; run POSIX tooling explicitly
+-- through msys2 bash (see :DkpMake) rather than by inheriting it here.
+if vim.fn.has 'win32' == 1 then
+  vim.o.shell = 'cmd.exe'
+  vim.o.shellcmdflag = '/s /c'
+  vim.o.shellquote = ''
+  vim.o.shellxquote = '"'
+  vim.o.shellxescape = ''
+  vim.o.shellredir = '>%s 2>&1'
+  -- Not nvim's '2>&1| tee' default: tee is not a cmd.exe command, so :make
+  -- silently writes no errorfile and quickfix comes back empty (E40).
+  vim.o.shellpipe = '>%s 2>&1'
+  vim.o.shellslash = false
+end
+
 vim.o.inccommand = 'split'
 vim.o.cursorline = true
 vim.o.scrolloff = 10

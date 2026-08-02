@@ -24,6 +24,17 @@ return {
         },
         ts_ls = {},
         bashls = {},
+        clangd = (function()
+          local cmd = { 'clangd', '--background-index', '--header-insertion=iwyu', '--clang-tidy' }
+          -- Let clangd interrogate devkitPro's cross compilers for their target
+          -- include paths; otherwise host headers leak in and <switch.h>,
+          -- <3ds.h> etc. all report as not found.
+          local globs = require('core.devkitpro').query_driver_globs()
+          if #globs > 0 then
+            table.insert(cmd, '--query-driver=' .. table.concat(globs, ','))
+          end
+          return { cmd = cmd }
+        end)(),
         yamlls = {
           settings = {
             yaml = {

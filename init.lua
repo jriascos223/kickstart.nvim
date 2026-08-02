@@ -11,6 +11,7 @@ end)
 require 'core.options'
 require 'core.keymaps'
 require 'core.autocmds'
+require('core.devkitpro').setup()
 
 -- Plugins (lazy.nvim bootstrap + specs)
 require 'plugins'
