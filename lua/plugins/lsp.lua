@@ -170,6 +170,9 @@ return {
             'jdtls',
             -- handled by kotlin lsp below
             'kotlin_lsp',
+            -- superseded by kotlin_lsp; never auto-enable the community server,
+            -- it attaches alongside kotlin_lsp and crashes on object declarations
+            'kotlin_language_server',
           },
         },
         automatic_installation = false,
