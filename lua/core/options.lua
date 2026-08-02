@@ -42,8 +42,11 @@ if vim.fn.has 'win32' == 1 then
   vim.o.shellxquote = '"'
   vim.o.shellxescape = ''
   vim.o.shellredir = '>%s 2>&1'
-  -- Not nvim's '2>&1| tee' default: tee is not a cmd.exe command, so :make
-  -- silently writes no errorfile and quickfix comes back empty (E40).
+  -- Not nvim's '2>&1| tee' default. tee itself is fine here, but a 'makeprg'
+  -- that contains quotes -- which the devkitPro build needs, see
+  -- core/devkitpro.lua -- gets mangled when cmd.exe re-quotes the whole command
+  -- around the pipe: :make then writes no errorfile at all and quickfix comes
+  -- back empty with E40. The plain redirect composes correctly either way.
   vim.o.shellpipe = '>%s 2>&1'
   vim.o.shellslash = false
 end
