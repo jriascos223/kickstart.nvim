@@ -152,7 +152,8 @@ return {
     'echasnovski/mini.nvim',
     config = function()
       require('mini.ai').setup { n_lines = 500 }
-      require('mini.surround').setup()
+      -- mini.surround intentionally NOT enabled: nvim-surround (plugins/editing.lua)
+      -- owns ys/cs/ds. Enabling both makes the winner load-order dependent.
       local statusline = require 'mini.statusline'
       statusline.setup { use_icons = vim.g.have_nerd_font }
       statusline.section_location = function()

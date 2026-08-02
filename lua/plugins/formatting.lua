@@ -14,7 +14,9 @@ return {
       },
     },
     opts = {
-      notify_on_error = false,
+      -- Surface missing/failing formatters instead of silently no-op'ing
+      -- (ktlint in particular is not installed via Mason).
+      notify_on_error = true,
       format_on_save = function(bufnr)
         local disable = { kotlin = true, c = true, cpp = true, swift = true, json = true, yaml = true, typescriptreact = true, typescript = true }
         if disable[vim.bo[bufnr].filetype] then

@@ -10,13 +10,38 @@ return {
     end
 
     local jdtls_dir = vim.fn.stdpath 'data' .. '/mason/share/jdtls'
-    local config_dir = vim.fn.stdpath 'data' .. '/mason/packages/jdtls/config_linux'
-    local machine_conf = require 'local'
+
+    -- jdtls ships a separate equinox config per platform; picking the wrong one
+    -- makes the launcher fail to start with no useful error.
+    local config_suffix = 'config_linux'
+    if vim.fn.has 'win32' == 1 then
+      config_suffix = 'config_win'
+    elseif vim.fn.has 'mac' == 1 then
+      config_suffix = 'config_mac'
+    end
+    local config_dir = vim.fn.stdpath 'data' .. '/mason/packages/jdtls/' .. config_suffix
+
+    -- Prefer JAVA_HOME; lua/local.lua is an optional per-machine override and is
+    -- not tracked in git, so it may not exist at all.
+    local machine_ok, machine_conf = pcall(require, 'local')
+    if not machine_ok then
+      machine_conf = {}
+    end
+    -- Only honour the override if it actually resolves, so a path left over from
+    -- another machine falls through to JAVA_HOME instead of failing to launch.
+    local java_exe
+    if machine_conf.JAVA21 and vim.fn.executable(machine_conf.JAVA21) == 1 then
+      java_exe = machine_conf.JAVA21
+    elseif vim.env.JAVA_HOME and vim.env.JAVA_HOME ~= '' then
+      java_exe = vim.env.JAVA_HOME .. '/bin/java' .. (vim.fn.has 'win32' == 1 and '.exe' or '')
+    else
+      java_exe = 'java'
+    end
 
     -- local workspace_dir = vim.fn.fnamemodify(vim.fn.getcwd(), ':p:h:h')
     local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ':p:h:t')
     local workspace_dir = vim.fn.stdpath 'data' .. '/site/java/workspace-root/' .. project_name
-    os.execute('mkdir ' .. workspace_dir)
+    vim.fn.mkdir(workspace_dir, 'p')
 
     -- Needed for debugging
     local bundles = {
@@ -31,7 +56,7 @@ return {
 
     local config = {
       cmd = {
-        machine_conf.JAVA21,
+        java_exe,
         '-Declipse.application=org.eclipse.jdt.ls.core.id1',
         '-Dosgi.bundles.defaultStartLevel=4',
         '-Declipse.product=org.eclipse.jdt.ls.core.product',

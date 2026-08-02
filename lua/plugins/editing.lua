@@ -15,7 +15,8 @@ return {
     dependencies = { 'nvim-lua/plenary.nvim' },
     keys = {
       { '<leader>S', '<cmd>lua require("spectre").toggle()<cr>', desc = 'Toggle Spectre' },
-      { '<leader>sw', '<cmd>lua require("spectre").open_visual({select_word=true})<cr>', desc = 'Search current word' },
+      -- <leader>sw belongs to the snacks picker (grep_word); Spectre takes sW.
+      { '<leader>sW', '<cmd>lua require("spectre").open_visual({select_word=true})<cr>', desc = 'Search current word (Spectre)' },
       { '<leader>sp', '<cmd>lua require("spectre").open_file_search({select_word=true})<cr>', desc = 'Search in current file' },
     },
   },

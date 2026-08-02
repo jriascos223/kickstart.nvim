@@ -2,11 +2,15 @@ return {
   {
     'nvim-treesitter/nvim-treesitter',
     lazy = false,
+    -- Pinned explicitly: the `main` rewrite has a different API (`.install{}` /
+    -- `.setup{}` on the root module) and needs a C toolchain to build parsers.
+    -- This machine has no compiler, so stay on master and reuse the parsers
+    -- already compiled under lazy/nvim-treesitter/parser/.
+    branch = 'master',
     build = ':TSUpdate',
-    config = function()
-      require('nvim-treesitter').setup()
-
-      require('nvim-treesitter').install {
+    main = 'nvim-treesitter.configs',
+    opts = {
+      ensure_installed = {
         'bash',
         'c',
         'diff',
@@ -30,14 +34,12 @@ return {
         'yaml',
         'json',
         'dockerfile',
-      }
-
-      vim.api.nvim_create_autocmd('FileType', {
-        group = vim.api.nvim_create_augroup('nvim-treesitter-highlight', { clear = true }),
-        callback = function()
-          pcall(vim.treesitter.start)
-        end,
-      })
-    end,
+      },
+      -- Never build on the fly: without a compiler that just throws on every
+      -- new filetype. Install a toolchain, then run :TSInstall <lang> manually.
+      auto_install = false,
+      sync_install = false,
+      highlight = { enable = true },
+    },
   },
 }

@@ -32,7 +32,16 @@ map('n', '<leader>ps', function()
       vim.notify('Proto symbol not found: ' .. symbol, vim.log.levels.WARN)
       return
     end
-    local file, line = result:match('^([^:]+):(%d+):')
+    -- rg prints "<file>:<line>:<text>". Peel off a Windows drive prefix first so
+    -- "C:\..." is not split at the drive colon.
+    local drive, rest = result:match '^(%a:)(.*)$'
+    if not drive then
+      drive, rest = '', result
+    end
+    local file, line = rest:match '^([^:]*):(%d+):'
+    if file then
+      file = drive .. file
+    end
     if not file or not line then
       vim.notify('Could not parse rg output: ' .. result, vim.log.levels.ERROR)
       return

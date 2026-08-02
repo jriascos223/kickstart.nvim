@@ -1,0 +1,18 @@
+-- Machine-specific overrides. Copy to lua/local.lua (gitignored) and edit.
+--
+-- Every value here is OPTIONAL. When a key is missing -- or points at a path
+-- that does not exist on this machine -- the config falls back to JAVA_HOME
+-- and then to whatever is on PATH, so an absent lua/local.lua is fine.
+local M = {}
+
+-- Absolute path to a Java 21 *executable*, used to launch jdtls.
+-- macOS/jenv example:
+--   M.JAVA21 = '/Users/you/.jenv/versions/21/bin/java'
+-- Windows example:
+--   M.JAVA21 = 'C:/Program Files/Eclipse Adoptium/jdk-21/bin/java.exe'
+
+-- JDK home directories, if you need to pin runtimes per project.
+-- M.JDK21_HOME = '/Users/you/.jenv/versions/21'
+-- M.JDK17_HOME = '/Users/you/.jenv/versions/17'
+
+return M

@@ -4,4 +4,10 @@ test.sh
 nvim
 
 spell/
-lazy-lock.json
+
+# Per-machine overrides -- copy lua/local.lua.example to lua/local.lua.
+# Optional: everything falls back to JAVA_HOME / PATH when it is absent.
+lua/local.lua
+
+# Neovim's own log output
+nvim.log

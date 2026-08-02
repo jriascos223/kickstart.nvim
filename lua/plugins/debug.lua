@@ -103,9 +103,13 @@ return {
           },
         }
       else
+        -- venv layout differs by platform: Scripts/python.exe on Windows,
+        -- bin/python everywhere else.
+        local venv = vim.fn.stdpath 'data' .. '/mason/packages/debugpy/venv'
+        local debugpy_python = vim.fn.has 'win32' == 1 and (venv .. '/Scripts/python.exe') or (venv .. '/bin/python')
         cb {
           type = 'executable',
-          command = vim.fn.stdpath 'data' .. '/mason/packages/debugpy/venv/bin/python',
+          command = debugpy_python,
           args = { '-m', 'debugpy.adapter' },
           options = {
             source_filetype = 'python',
@@ -121,8 +125,17 @@ return {
         request = 'launch',
         name = 'Launch file',
         program = '${file}',
+        -- Resolve from the active venv, then PATH -- never a hardcoded
+        -- /usr/bin/python3, which does not exist on Windows.
         pythonPath = function()
-          return '/usr/bin/python3'
+          local venv = vim.env.VIRTUAL_ENV or vim.env.CONDA_PREFIX
+          if venv and venv ~= '' then
+            local p = vim.fn.has 'win32' == 1 and (venv .. '/Scripts/python.exe') or (venv .. '/bin/python')
+            if vim.fn.executable(p) == 1 then
+              return p
+            end
+          end
+          return vim.fn.exepath 'python3' ~= '' and vim.fn.exepath 'python3' or vim.fn.exepath 'python'
         end,
       },
     }
